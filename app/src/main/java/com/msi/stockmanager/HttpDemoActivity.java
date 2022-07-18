@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,7 +26,10 @@ import com.msi.stockmanager.data.stock.StockHistory;
 import com.msi.stockmanager.data.stock.StockInfo;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class HttpDemoActivity extends AppCompatActivity {
@@ -42,7 +46,8 @@ public class HttpDemoActivity extends AppCompatActivity {
     private Spinner spinnerRanges = null;
     private Button btnHistory = null;
     private TextView showResult = null;
-
+    private Button Klinebtn = null;
+    private  ArrayList<String> stockdataArray = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +58,21 @@ public class HttpDemoActivity extends AppCompatActivity {
         btnTest = (Button) findViewById(R.id.btn_http_test);
         showPrice = (TextView) findViewById(R.id.show_price);
         showPrice.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+        /*---------K bar show------------*/
+        Klinebtn = (Button) findViewById(R.id.btn_Kline);
+        Klinebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Intent intent = new Intent(HttpDemoActivity.this, KlineViewActivity.class);
+                Intent intent = new Intent(HttpDemoActivity.this, KlineViewActivity.class);
+//                startActivity(intent);
+                intent.putStringArrayListExtra("stock_history_price", stockdataArray);
+                startActivity(intent);
+
+            }
+        });
+        /*-------------------------------*/
+
 
         spinnerInterval = (Spinner) findViewById(R.id.spinner_interval);
         ArrayAdapter adapterInterval = ArrayAdapter.createFromResource(this
@@ -127,6 +147,7 @@ public class HttpDemoActivity extends AppCompatActivity {
         btnHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                stockdataArray.clear();
                 String code = stockCodeInput.getText().toString();
                 String interval = getInterval();
                 String ranges = getRanges();
@@ -143,11 +164,17 @@ public class HttpDemoActivity extends AppCompatActivity {
                         handler.sendMessage(handler.obtainMessage(MESSAGE_APPEND_RESULT, "DATE                    OPEN  CLOSE   HIGH   LOW        VOLUME\n"));
                         handler.sendMessage(handler.obtainMessage(MESSAGE_APPEND_RESULT, "===================== ====== ====== ====== ====== ============\n"));
                         for (StockHistory a : data) {
-                            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(a.date_timestamp * 1000));
+//                            String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(a.date_timestamp * 1000));
+                            String timestamp = new SimpleDateFormat("yyyy-MM-dd").format(new Date(a.date_timestamp * 1000));
                             handler.sendMessage(handler.obtainMessage(MESSAGE_APPEND_RESULT, "[" + timestamp + "] " +
                                     String.format("%6.1f", a.price_open) + " " + String.format("%6.1f", a.price_close) + " " +
                                     String.format("%6.1f", a.price_high) + " " + String.format("%6.1f", a.price_low) + " " +
-                                    String.format("%12.1f", a.price_volume) + "\n"));
+                                    String.format("%f", a.price_volume) + "\n"));
+
+
+                            stockdataArray.add(timestamp+"\t"+a.price_open+"\t"+a.price_close+"\t"+a.price_high+"\t"+a.price_low+"\t"+String.format("%12.3f",a.price_volume/10000));
+
+
                         }
                     }
 
@@ -171,5 +198,6 @@ public class HttpDemoActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

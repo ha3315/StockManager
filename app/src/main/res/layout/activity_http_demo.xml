@@ -75,12 +75,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <Button
             android:id="@+id/btn_http_history"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="查詢歷史股價"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/btn_Kline"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="K線圖"
             android:textSize="12dp" />
     </LinearLayout>
 
